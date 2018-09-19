@@ -8,6 +8,8 @@
 #token: Unit for tokenizing, or a custom tokenizing function.
 #seperate: turns a single character column into multiple columns.
 #filter: find rows/cases where conditions are true.
+
+
  library(dplyr)
  count_bigrams <- function(dataset) {
  dataset %>%

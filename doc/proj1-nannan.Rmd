@@ -5,6 +5,7 @@ date: "September 17, 2018"
 output:
   html_document: default
   pdf_document: default
+  word_document: default
 ---
 ```{r, message= F,warning = FALSE}
 library(tidyverse)
@@ -188,19 +189,6 @@ Marital %>% group_by(Marital_group) %>% count(predicted_category) %>% ggplot(aes
 
 In this part, we find that single people get happiness from achievement most and the affection is the second, which perhaphs means that single people have less happiness from affection whithout their own kids and husband(wife).
 
-## LDA 
-```{r}
-#Find the sum of words in each Document
-#rowTotals <- apply(tdm , 1, sum)
-#tdm <- tdm[rowTotals > 0, ]
-#topic <- LDA(text_wc_df, k=5, method = "Gibbs", 
-            #control = list(seed = 2018,
-                           # burnin = 1000,
-                           # thin = 100,
-                           # iter = 1000,
-                           # alpha = 0.5))
-#terms(topic,5)
-```
 
 ## 4. Logistic Regrssion
 In this part, we want to explore deeper in people's happy moments, we can apply logistic regression to build some classifiers to recognize people's gender/marital status/parenthood status according to their happy moment descriptions.

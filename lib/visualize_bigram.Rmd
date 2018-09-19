@@ -9,6 +9,8 @@
 #geom_node_point: This geom is equivalent in functionality to geom_point and allows for simple plotting of nodes in different shapes, colours and sizes.
 #geom_node_text: These geoms are equivalent in functionality to geom_text and geom_label and allows for simple annotation of nodes.
 #theme_void: These are complete themes which control all non-data display. 
+
+
 visualize_bigrams <- function(bigrams) {
 set.seed(2018)
 a <- grid::arrow(type = "closed", length = unit(.15, "inches"))
