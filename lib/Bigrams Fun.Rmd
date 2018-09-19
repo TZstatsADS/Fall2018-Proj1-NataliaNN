@@ -1,13 +1,13 @@
 
-##### count_bigrams is a function which counts the two consecutive words in the text.
-##### Argument includes:
-##### dataset: the text dataset we want to explore.
-##### bigram: output column to be created.
-##### cleaned_hm: input column that gets split.
-##### token: Unit for tokenizing, or a custom tokenizing function.
-##### seperate: turns a single character column into multiple columns.
-##### filter: find rows/cases where conditions are true.
 ```{r}
+#count_bigrams is a function which counts the two consecutive words in the text.
+#Argument includes:
+#dataset: the text dataset we want to explore.
+#bigram: output column to be created.
+#cleaned_hm: input column that gets split.
+#token: Unit for tokenizing, or a custom tokenizing function.
+#seperate: turns a single character column into multiple columns.
+#filter: find rows/cases where conditions are true.
  library(dplyr)
  count_bigrams <- function(dataset) {
  dataset %>%
