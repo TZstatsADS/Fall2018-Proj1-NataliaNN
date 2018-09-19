@@ -1,0 +1,29 @@
+---
+title: "Bigrams"
+author: "Nannan Wang"
+date: "September 19, 2018"
+output: html_document
+---
+```{r}
+# count_bigrams is a function which counts the two consecutive words in the text.
+# Argument includes:
+# dataset: the text dataset we want to explore.
+# bigram: output column to be created.
+# cleaned_hm: input column that gets split.
+# token: Unit for tokenizing, or a custom tokenizing function.
+# seperate: turns a single character column into multiple columns.
+# filter: find rows/cases where conditions are true.
+library(dplyr)
+count_bigrams <- function(dataset) {
+dataset %>%
+unnest_tokens(bigram, cleaned_hm , token = "ngrams", n = 2) %>%
+separate(bigram, c("word1", "word2"), sep = " ") %>%
+filter(!word1 %in% stop_words$word,
+!word2 %in% stop_words$word) %>%
+count(word1, word2, sort = TRUE)
+}
+ 
+#text_bigrams <- newdata %>%
+#count_bigrams()
+```
+
