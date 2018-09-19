@@ -1,0 +1,26 @@
+```{r}
+#visualize_bigrams is a function which uses newtwork graph to visualize bigrams.
+#Argument includes:
+#arrow: Produces a description of what arrows to add to a line
+#type: Indicating whether the arrow head should be a closed triangle.
+#length: A unit specifying the length of the arrow head (from tip to base).
+#graph_from_data_frame(): This function creates an igraph graph from one or two data frames containing the (symbolic) edge list and edge/vertex attributes.
+#geom_edge_link: This geom draws edges in the simplest way - as straight lines between the start and end nodes.
+#geom_node_point: This geom is equivalent in functionality to geom_point and allows for simple plotting of nodes in different shapes, colours and sizes.
+#geom_node_text: These geoms are equivalent in functionality to geom_text and geom_label and allows for simple annotation of nodes.
+#theme_void: These are complete themes which control all non-data display. 
+visualize_bigrams <- function(bigrams) {
+set.seed(2018)
+a <- grid::arrow(type = "closed", length = unit(.15, "inches"))
+ 
+bigrams %>%
+graph_from_data_frame() %>%
+ggraph(layout = "fr") +
+geom_edge_link(aes(edge_alpha = n), show.legend = FALSE, arrow = a) +
+geom_node_point(color = "lightblue", size = 5) +
+geom_node_text(aes(label = name), vjust = 1, hjust = 1) +
+ggtitle("Network graph of bigrams") +
+theme_void()
+}
+```
+
