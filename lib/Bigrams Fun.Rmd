@@ -1,10 +1,4 @@
----
-title: "Bigrams"
-author: "Nannan Wang"
-date: "September 19, 2018"
-output: html_document
----
-```{r}
+
 # count_bigrams is a function which counts the two consecutive words in the text.
 # Argument includes:
 # dataset: the text dataset we want to explore.
@@ -22,7 +16,6 @@ filter(!word1 %in% stop_words$word,
 !word2 %in% stop_words$word) %>%
 count(word1, word2, sort = TRUE)
 }
- 
 #text_bigrams <- newdata %>%
 #count_bigrams()
 ```
