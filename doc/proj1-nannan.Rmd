@@ -44,6 +44,8 @@ newdata <- new %>%
   mutate(reflection_period = fct_recode(reflection_period, 
                                         months_3 = "3m", hours_24 = "24h"))
 newdata <- na.omit(newdata)
+setwd("/Users/somno/Documents/GitHub/Fall2018-Proj1-NataliaNN/output")
+write.csv(newdata, "newdata.csv", sep = "")
 # head(newdata)
 ```
 
