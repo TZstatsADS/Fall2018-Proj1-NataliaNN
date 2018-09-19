@@ -6,7 +6,7 @@ output:
   html_document: default
   pdf_document: default
 ---
-```{r}
+```{r, message= F,warning = FALSE}
 library(tidyverse)
 library(tidytext)
 library(DT)
@@ -24,10 +24,11 @@ library(text2vec)
 library(data.table)
 library(magrittr)
 library(glmnet)
+library(topicmodels)
 ```
 
-# 1.Data Preparation 
-```{r}
+## 1.Data Preparation 
+```{r, message= F,warning = FALSE}
 urlfile1 <- 'https://raw.githubusercontent.com/rit-public/HappyDB/master/happydb/data/cleaned_hm.csv'
 hm_data <- read_csv(urlfile1)
 urlfile2 <- 'https://raw.githubusercontent.com/rit-public/HappyDB/master/happydb/data/demographic.csv'
@@ -45,9 +46,11 @@ newdata <- na.omit(newdata)
 # head(newdata)
 ```
 
-# 2.Data Presentation
+## 2.Data Presentation
+In this part, we use different forms to display the happy moments' text and explore some interesting details.
+
 ###2.1 Word Count
-```{r}
+```{r,message= F,warning = FALSE}
 word.count <- vector(length = length(newdata$cleaned_hm))
 for (i in 1:length(newdata$cleaned_hm)) {
   word.count[i] <- wordcount(newdata$cleaned_hm[i], sep = " ", count.function = sum)
@@ -63,9 +66,10 @@ ggplot(newnewdata, aes(x=word.count)) +
   ggtitle("Distribution of word count") +
   theme_minimal()
 ```
+In this Part, I count the word number for each happy moment discribtion, and most people can express their happiness with less than 15 words. It perhaps shows that happiness do not need too much words to speak out.
 
 ###2.2 Word Frequency
-```{r}
+```{r, message= F,warning = FALSE}
 happy_text <- newdata$cleaned_hm
 docs <- Corpus(VectorSource(happy_text))
 # Converting the text to lower case
@@ -90,8 +94,10 @@ max.words=300, random.order=FALSE, rot.per=0.15,
 colors=brewer.pal(10, "Dark2"))
 ```
 
+In this part, We find that some words appear most frenquently in people's happy moments, such like: "work", "friend", "new", "family", "son","game", "birthday" etc.
+
 ###2.3 Bigrams 
-```{r}
+```{r, message= F,warning = FALSE}
 count_bigrams <- function(dataset) {
 dataset %>%
 unnest_tokens(bigram, cleaned_hm , token = "ngrams", n = 2) %>%
@@ -107,8 +113,10 @@ count_bigrams()
 head(text_bigrams, 10)
 ```
 
+In this part, we focus on the bigrams which are phrases we used in the daily life. In terms of top 10 bigrams, we find top three meaningful phrases which play very important roles in people's happy moments:1)birthday party 2)video game 3)ice cream, that is amazing!
+
 ###2.4 Bigrams Visualization
-```{r}
+```{r,message= F,warning = FALSE}
 visualize_bigrams <- function(bigrams) {
 set.seed(2018)
 a <- grid::arrow(type = "closed", length = unit(.15, "inches"))
@@ -130,9 +138,12 @@ text_bigrams %>%
 visualize_bigrams()
 ```
 
-# 3.Exploration of Happy Moments
+In this part, based on the bigrams we focused, we visualize the bigrams using the network graph, and we can find the most popular happy moments and their connections! For instance, the wedding/date/marriage can be connected together.
+
+## 3.Exploration of Happy Moments
+In this part, we wan to explore different Categories of Happy Moments, and we also explore the moments by different age groups/ gender groups/ marital groups.
 ###3.1 Percentage of Happy Moments by Category
-```{r}
+```{r,message= F,warning = FALSE}
 ggplot(data.frame(prop.table(table(newdata$predicted_category))), aes(x=Var1, y = Freq*100, fill = Var1)) + 
   geom_bar(stat = 'identity') + 
   xlab('Happy Category') + 
@@ -141,8 +152,10 @@ ggplot(data.frame(prop.table(table(newdata$predicted_category))), aes(x=Var1, y 
   ggtitle('Percentage of Happy Moments by Category')
 ```
 
+In this part, we find that based on all the happy moments, people get their happiness from affenction most, and then the achivement, which is related to the wordcloud we generated above.
+
 ###3.2 Happy Category by Age
-```{r}
+```{r,message= F,warning = FALSE}
 newdata$age <- as.numeric(as.character(newdata$age))
 ages <- newdata  %>% select(wid, age, predicted_category) %>% mutate(Age_group = ifelse(age < 18, '0-18',ifelse(age < 30, '18-29', ifelse(age < 40, '30-39', ifelse(age < 50, '40-49', ifelse(age < 60, '50-59', ifelse(age < 70, '60-69', ifelse(age < 80, '70-79', ifelse(age < 90, '80-89', '90-99')))))))))
 
@@ -151,8 +164,10 @@ ages <- ages %>% mutate(Age_group = factor(Age_group), predicted_category = fact
 ages %>% filter(age < 100) %>% group_by(Age_group) %>% count(predicted_category) %>% ggplot(aes(predicted_category, n, fill = Age_group)) + geom_bar(stat='identity', show.legend = FALSE) + facet_wrap(~Age_group, scales = 'free') + xlab('Happy Category') + ylab('Number of Happy Moments') + geom_text(aes(label = n), hjust = .73) + coord_flip()
 ```
 
+In this part, based on different age group, we can not explore significant difference bewteen different groups, they all get happiness from affection most, and second is the achievement.
+
 ###3.3 Happy Category by Gender
-```{r}
+```{r,message= F,warning = FALSE}
 genders <- newdata  %>% select(wid, gender, predicted_category) %>% mutate(Gender_group = ifelse(gender == "f" , 'female',ifelse(gender == "m", 'male',NA)))
 
 genders <- genders %>% mutate(Gender_group = factor(Gender_group), predicted_category = factor(predicted_category, levels = rev(c( 'achievement', 'affection', 'bonding',  'enjoy_the_moment','exercise', 'leisure', 'nature'))))
@@ -160,8 +175,10 @@ genders <- genders %>% mutate(Gender_group = factor(Gender_group), predicted_cat
 genders %>% group_by(Gender_group) %>% count(predicted_category) %>% ggplot(aes(predicted_category, n, fill = Gender_group)) + geom_bar(stat='identity', show.legend = FALSE) + facet_wrap(~Gender_group, scales = 'free') + xlab('Happy Category') + ylab('Number of Happy Moments') + geom_text(aes(label = n), hjust = .73) + coord_flip()
 ```
 
+In this part, we find that male get happiness from achievement most which is totally different from the results above, and also exercise accounts for a lot by male than female. That makes sense!
+
 ###3.4 Happy Category by Marital Status
-```{r}
+```{r,message= F,warning = FALSE}
 Marital <- newdata  %>% select(wid, marital, predicted_category) %>% mutate(Marital_group = ifelse(marital == "married" , 'married',ifelse(marital == "single", 'single',NA)))
 
 Marital <- Marital %>% mutate(Marital_group = factor(Marital_group), predicted_category = factor(predicted_category, levels = rev(c( 'achievement', 'affection', 'bonding',  'enjoy_the_moment','exercise', 'leisure', 'nature'))))
@@ -169,9 +186,26 @@ Marital <- Marital %>% mutate(Marital_group = factor(Marital_group), predicted_c
 Marital %>% group_by(Marital_group) %>% count(predicted_category) %>% ggplot(aes(predicted_category, n, fill = Marital_group)) + geom_bar(stat='identity', show.legend = FALSE) + facet_wrap(~Marital_group, scales = 'free') + xlab('Happy Category') + ylab('Number of Happy Moments') + geom_text(aes(label = n), hjust = .73) + coord_flip()
 ```
 
-# 4. Logistic Regrssion
-###4.1 Classifier for Gender
+In this part, we find that single people get happiness from achievement most and the affection is the second, which perhaphs means that single people have less happiness from affection whithout their own kids and husband(wife).
+
+## LDA 
 ```{r}
+#Find the sum of words in each Document
+#rowTotals <- apply(tdm , 1, sum)
+#tdm <- tdm[rowTotals > 0, ]
+#topic <- LDA(text_wc_df, k=5, method = "Gibbs", 
+            #control = list(seed = 2018,
+                           # burnin = 1000,
+                           # thin = 100,
+                           # iter = 1000,
+                           # alpha = 0.5))
+#terms(topic,5)
+```
+
+## 4. Logistic Regrssion
+In this part, we want to explore deeper in people's happy moments, we can apply logistic regression to build some classifiers to recognize people's gender/marital status/parenthood status according to their happy moment descriptions.
+###4.1 Classifier for Gender
+```{r,message= F,warning = FALSE}
 genderdata <- cbind(newdata[,4], newdata[,11])
 genderdata$dum <- ifelse(genderdata$gender == "f", 1, 0)
 head(genderdata$cleaned_hm)
@@ -229,9 +263,10 @@ dtm_test = create_dtm(it_test, vectorizer)
 preds = predict(glmnet_classifier, dtm_test, type = 'response')[,1]
 glmnet:::auc(testgender$dum, preds)
 ```
+In this part, we make a classifier to classify people's gender. First, split 70% data randomly as train data and the rest 30% are test data. And then apply the logistic regression for train data. At last test the calssifier on the test data. In this case, we find the the classifier accurate is about 0.7297626 tested on the test data, the classifier works pretty well.
 
 ###4.2 Classifier for Marital Status
-```{r}
+```{r,message= F,warning = FALSE}
 maritaldata <- cbind(newdata[,4], newdata[,12])
 maritaldata$dum <- ifelse(maritaldata$marital== "married", 1, 0)
 trainnum <- round(0.7*nrow(maritaldata))
@@ -282,9 +317,10 @@ dtm_testm = create_dtm(it_testm, vectorizerm)
 predsm = predict(glmnet_classifierm, dtm_testm, type = 'response')[,1]
 glmnet:::auc(testmarital$dum, predsm)
 ```
+The same method as 4.1, and the accurate of marital classifier is 0.7783142, it also works well. The graph shows the max AUC is 0.7209.
 
 ###4.3 Classifier for Parenthood
-```{r}
+```{r, message= F,warning = FALSE}
 parentdata <- cbind(newdata[,4], newdata[,13])
 parentdata$dum <- ifelse(parentdata$parenthood== "y", 1, 0)
 trainnum <- round(0.7*nrow(parentdata))
@@ -335,4 +371,4 @@ dtm_testp = create_dtm(it_testp, vectorizerp)
 predsp = predict(glmnet_classifierp, dtm_testp, type = 'response')[,1]
 glmnet:::auc(testparent$dum, predsp)
 ```
-
+The same method as 4.1, and the accurate of parent classifier is 0.7241155, it also works well.
